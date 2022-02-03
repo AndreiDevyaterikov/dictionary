@@ -1,14 +1,25 @@
 import controller.Controller;
 import exception.DictionaryFormatException;
-import exception.NotExistWordException;
-import exception.WordExitException;
+import exception.EmptyDictionaryException;
+import exception.ExistWordDictionaryException;
+import exception.NotFoundWordDictionaryException;
+import service.DictionaryService;
+import service.FileService;
 
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws DictionaryFormatException, WordExitException, NotExistWordException, IOException {
-        Controller controller = new Controller();
-        controller.control();
+
+
+    public static void main(String[] args) throws
+            IOException,
+            DictionaryFormatException,
+            ExistWordDictionaryException,
+            EmptyDictionaryException,
+            NotFoundWordDictionaryException {
+
+        Controller controller = new Controller(new DictionaryService(new FileService()));
+        System.out.println(controller.selectDictionary());
 
     }
 }

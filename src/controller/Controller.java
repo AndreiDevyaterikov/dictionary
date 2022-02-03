@@ -1,12 +1,12 @@
 package controller;
 
 import exception.DictionaryFormatException;
-import exception.NotExistWordException;
-import exception.WordExitException;
-import model.BaseDictionary;
-import model.EnglishDictionary;
-import model.NumberDictionary;
-import service.FileService;
+import exception.EmptyDictionaryException;
+import exception.ExistWordDictionaryException;
+import exception.NotFoundWordDictionaryException;
+import model.DictionaryModel;
+import model.Phrase;
+import service.DictionaryService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,34 +15,35 @@ import java.util.Map;
 
 public class Controller {
 
-    public void control() throws IOException, DictionaryFormatException, WordExitException, NotExistWordException {
+    private final DictionaryService dictionaryService;
 
-        BaseDictionary engDictionary = new EnglishDictionary("EnglishDictionary.txt");
-        BaseDictionary numbDictionary = new NumberDictionary("NumberDictionary.txt");
+    public Controller(DictionaryService dictionaryService) {
+        this.dictionaryService = dictionaryService;
+    }
+
+    public Map<String, String> selectDictionary() throws IOException, DictionaryFormatException, ExistWordDictionaryException, EmptyDictionaryException, NotFoundWordDictionaryException {
+
+        DictionaryModel numberDictionary = new DictionaryModel("NumberDictionary.txt", "[0-9]+");
+        DictionaryModel englishDictionary = new DictionaryModel("EnglishDictionary.txt", "[a-zA-Z]+");
 
 
         System.out.println("""
                 Choose dictionary:\s
                 1 - EnglishDictionary\s
                 2 - NumberDictionary\s
-                """);
+                3 - Exit""");
 
         String typeDictionary = new BufferedReader(new InputStreamReader(System.in)).readLine();
-        while (true){
-            switch (typeDictionary){
-                case "1":{
-                    actionWithDictionary(engDictionary);
-                }
-                case "2":{
-                    actionWithDictionary(numbDictionary);
-                }
-                default: break;
-            }
-        }
 
+        return switch (typeDictionary){
+            case "1" -> actionWithDictionary(englishDictionary);
+            case "2" -> actionWithDictionary(numberDictionary);
+            default -> null;
+        };
     }
 
-    private void actionWithDictionary(BaseDictionary baseDictionary) throws IOException, DictionaryFormatException, WordExitException, NotExistWordException {
+
+    private Map<String, String> actionWithDictionary(DictionaryModel dictionary) throws IOException, DictionaryFormatException, ExistWordDictionaryException, EmptyDictionaryException, NotFoundWordDictionaryException {
         System.out.println("""
                 Action with dictionary:\s
                 1 - Add\s
@@ -50,36 +51,42 @@ public class Controller {
                 3 - GetDictionary\s
                 """);
         String actionWithDictionary = new BufferedReader(new InputStreamReader(System.in)).readLine();
-        switch (actionWithDictionary){
-            case "1": add(baseDictionary);
-            case "2": delete(baseDictionary);
-            case "3" :getDictionary(baseDictionary);
-        }
+
+        return switch (actionWithDictionary) {
+            case "1" -> addPhrase(dictionary);
+            case "2" -> deletePhrase(dictionary);
+            case "3" -> getDictionary(dictionary);
+            default -> null;
+        };
     }
 
-    public Map<String, String> add(BaseDictionary dictionary) throws IOException, DictionaryFormatException, WordExitException {
+    private Map<String, String> getDictionary(DictionaryModel dictionary) throws IOException {
+        return dictionaryService.getDictionary(dictionary.getPathFile());
+    }
+
+    private Map<String, String> deletePhrase(DictionaryModel dictionary) throws IOException, EmptyDictionaryException, NotFoundWordDictionaryException {
+        System.out.println("Key: ");
+        String key = new BufferedReader(new InputStreamReader(System.in)).readLine();
+
+        return dictionaryService.deletePhrase(key, dictionary);
+    }
+
+    private Map<String, String> addPhrase(DictionaryModel dictionary) throws IOException, DictionaryFormatException, ExistWordDictionaryException {
+
         System.out.println("Key: ");
         String key = new BufferedReader(new InputStreamReader(System.in)).readLine();
 
         System.out.println("Value: ");
         String value = new BufferedReader(new InputStreamReader(System.in)).readLine();
 
-         return dictionary.add(key, value);
+        Phrase phrase = new Phrase();
+        phrase.setWord(key);
+        phrase.setTranslate(value);
+
+        return dictionaryService.addPhrase(phrase, dictionary);
     }
+    
+    
 
-    public void delete(BaseDictionary dictionary) throws IOException, NotExistWordException {
 
-        System.out.println("Key: ");
-        String key = new BufferedReader(new InputStreamReader(System.in)).readLine();
-
-        dictionary.delete(key);
-    }
-
-    public Map<String, String> getDictionary(BaseDictionary dictionary) throws IOException {
-
-        var x = dictionary.getDictionary();
-
-        FileService fileService = new FileService();
-        return fileService.readFromFile(dictionary.getPathFile());
-    }
 }

@@ -1,15 +1,12 @@
 package service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FileService {
 
-    private File checkExistFile(String fileName) throws IOException{
+    private File checkExistFile(String fileName) throws IOException {
 
         File file = new File(fileName);
         if(!file.exists()){
@@ -36,4 +33,13 @@ public class FileService {
         return dictionary;
     }
 
+    public Map<String, String> writeToFile(Map<String, String> dictionary, String pathFile) throws IOException {
+
+        FileWriter writer = new FileWriter(checkExistFile(pathFile));
+        for(Map.Entry<String, String> entry : dictionary.entrySet()){
+            writer.write(entry.getKey() + " - " + entry.getValue());
+        }
+        writer.close();
+        return dictionary;
+    }
 }
