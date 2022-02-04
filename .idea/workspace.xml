@@ -2,26 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="61735adf-8b79-48fd-8687-69b2b732765b" name="Changes" comment="Попытка Strategy паттерна -&gt; пока безуспешно">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/exception/EmptyDictionaryException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/exception/ExistWordDictionaryException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/exception/NotFoundWordDictionaryException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/model/DictionaryModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/model/Phrase.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/service/DictionaryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/exception/DictionaryFormatException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/exception/DictionaryFormatException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/exception/NotExistWordException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/exception/WordExitException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/BaseDictionary.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/EnglishDictionary.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/NumberDictionary.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/service/FileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/FileService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/strategy/BaseStrategy.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/strategy/EnglishStrategy.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/strategy/NumberStrategy.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,6 +70,7 @@
       <updated>1643744336911</updated>
       <workItem from="1643744342633" duration="54000" />
       <workItem from="1643799744254" duration="14255000" />
+      <workItem from="1643965502752" duration="1298000" />
     </task>
     <task id="LOCAL-00001" summary="Попытка Strategy паттерна -&gt; пока безуспешно">
       <created>1643814088919</created>
