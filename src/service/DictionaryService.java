@@ -8,6 +8,7 @@ import model.DictionaryModel;
 import model.Phrase;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DictionaryService {
@@ -18,19 +19,28 @@ public class DictionaryService {
         this.fileService = fileService;
     }
 
-    public Map<String, String> addPhrase(Phrase phrase, DictionaryModel dictionaryModel) throws IOException, DictionaryFormatException, ExistWordDictionaryException {
+    public Map<String, String> addPhrase(Phrase phrase, DictionaryModel dictionaryModel)  {
 
         Map<String, String> dictionaryMap = getDictionary(dictionaryModel.getPathFile());
-        if(!phrase.getWord().matches(dictionaryModel.getPattern())){
-            throw new DictionaryFormatException("Correct dictionary format - " + dictionaryModel.getPattern());
-        }
-        if(dictionaryMap.size() != 0){
-            for(Map.Entry<String, String> entry : dictionaryMap.entrySet()){
-                if(phrase.getWord().equals(entry.getKey())){
-                    throw new ExistWordDictionaryException("Already exit translate with word: " + phrase.getWord());
+
+        try {
+
+            if(!phrase.getWord().matches(dictionaryModel.getPattern())){
+                throw new DictionaryFormatException("Correct dictionary format - " + dictionaryModel.getPattern());
+            }
+
+            if(!dictionaryMap.isEmpty()){
+                for(Map.Entry<String, String> entry : dictionaryMap.entrySet()){
+                    if(phrase.getWord().equals(entry.getKey())){
+                        throw new ExistWordDictionaryException("Already exit translate with word: " + phrase.getWord());
+                    }
                 }
             }
+
+        }catch (DictionaryFormatException | ExistWordDictionaryException e){
+            System.out.println(e.getMessage());
         }
+
         dictionaryMap.put(phrase.getWord(), phrase.getTranslate());
         return fileService.writeToFile(dictionaryMap, dictionaryModel.getPathFile());
     }
@@ -52,8 +62,14 @@ public class DictionaryService {
         return dictionaryMap;
     }
 
-    public Map<String, String> getDictionary(String pathFile) throws IOException {
-        return fileService.readFromFile(pathFile);
+    public Map<String, String> getDictionary(String pathFile)  {
+        Map<String, String> dictionary = new HashMap<>();
+        try {
+            dictionary = fileService.readFromFile(pathFile);
+        } catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+        return dictionary;
     }
 
 }
