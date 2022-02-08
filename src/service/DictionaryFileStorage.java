@@ -1,8 +1,11 @@
 package service;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class DictionaryFileStorage {
 
@@ -20,26 +23,47 @@ public class DictionaryFileStorage {
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
-
         return file;
     }
 
-    public Map<String, String> readFromFile(String pathFile) throws IOException {
+    private String readFile(String pathFile){
 
-        File file = getFile(pathFile);
+        var file = getFile(pathFile);
+
+        StringBuilder body = new StringBuilder();
+
+        try(Scanner scanner = new Scanner(file)) {
+
+            while((scanner.hasNextLine())){
+                String line = scanner.nextLine();
+                if(!body.isEmpty()){
+                    body.append("\n");
+                }
+                body.append(line);
+            }
+
+        } catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+        return body.toString();
+    }
+
+
+    public Map<String, String> parseBody(String pathFile){
+
+        var body = readFile(pathFile);
+        var strings = body.split("\n");
 
         Map<String, String> dictionary = new HashMap<>();
 
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String line;
-        while((line = br.readLine()) != null){
-            var pairWords = line.split("-");
-            dictionary.put(pairWords[0], pairWords[1]);
+        for(var string : strings){
+           var pairsWords = string.split("-");
+           dictionary.put(pairsWords[0], pairsWords[1]);
         }
-        br.close();
-
         return dictionary;
     }
+
+
 
     public Map<String, String> writeToFile(Map<String, String> dictionary, String pathFile) throws IOException {
 
