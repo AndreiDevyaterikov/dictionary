@@ -12,10 +12,10 @@ import java.util.Map;
 
 public class DictionaryService {
 
-    private final FileService fileService;
+    private final DictionaryFileStorage dictionaryFileStorage;
 
-    public DictionaryService(FileService fileService) {
-        this.fileService = fileService;
+    public DictionaryService(DictionaryFileStorage dictionaryFileStorage) {
+        this.dictionaryFileStorage = dictionaryFileStorage;
     }
 
     public Map<String, String> addPhrase(Phrase phrase, DictionaryModel dictionaryModel) throws IOException, DictionaryFormatException, ExistWordDictionaryException {
@@ -32,7 +32,7 @@ public class DictionaryService {
             }
         }
         dictionaryMap.put(phrase.getWord(), phrase.getTranslate());
-        return fileService.writeToFile(dictionaryMap, dictionaryModel.getPathFile());
+        return dictionaryFileStorage.writeToFile(dictionaryMap, dictionaryModel.getPathFile());
     }
 
     public Map<String, String> deletePhrase(String word, DictionaryModel dictionaryModel) throws IOException, NotFoundWordDictionaryException, EmptyDictionaryException {
@@ -53,7 +53,7 @@ public class DictionaryService {
     }
 
     public Map<String, String> getDictionary(String pathFile) throws IOException {
-        return fileService.readFromFile(pathFile);
+        return dictionaryFileStorage.readFromFile(pathFile);
     }
 
 }

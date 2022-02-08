@@ -4,7 +4,7 @@ import exception.EmptyDictionaryException;
 import exception.ExistWordDictionaryException;
 import exception.NotFoundWordDictionaryException;
 import service.DictionaryService;
-import service.FileService;
+import service.DictionaryFileStorage;
 
 import java.io.IOException;
 
@@ -18,7 +18,7 @@ public class Main {
             EmptyDictionaryException,
             NotFoundWordDictionaryException {
 
-        Controller controller = new Controller(new DictionaryService(new FileService()));
+        Controller controller = new Controller(new DictionaryService(new DictionaryFileStorage()));
         System.out.println(controller.selectDictionary());
 
     }

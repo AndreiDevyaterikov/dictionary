@@ -4,21 +4,29 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FileService {
+public class DictionaryFileStorage {
 
-    private File checkExistFile(String fileName) throws IOException {
+    private File getFile(String pathFile)  {
 
-        File file = new File(fileName);
-        if(!file.exists()){
-            file.createNewFile();
-            return file;
+        File file = new File(pathFile);
+        try {
+            if(!file.exists()){
+                var created = file.createNewFile();
+                if(created){
+                    System.out.println("Created new file - " + pathFile);
+                }
+                return file;
+            }
+        } catch (IOException e){
+            System.out.println(e.getMessage());
         }
+
         return file;
     }
 
     public Map<String, String> readFromFile(String pathFile) throws IOException {
 
-        File file = checkExistFile(pathFile);
+        File file = getFile(pathFile);
 
         Map<String, String> dictionary = new HashMap<>();
 
@@ -35,7 +43,7 @@ public class FileService {
 
     public Map<String, String> writeToFile(Map<String, String> dictionary, String pathFile) throws IOException {
 
-        FileWriter writer = new FileWriter(checkExistFile(pathFile));
+        FileWriter writer = new FileWriter(getFile(pathFile));
         for(Map.Entry<String, String> entry : dictionary.entrySet()){
             writer.write(entry.getKey() + " - " + entry.getValue());
         }
