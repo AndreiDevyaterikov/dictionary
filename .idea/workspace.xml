@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="61735adf-8b79-48fd-8687-69b2b732765b" name="Changes" comment="Поменял название FileService на DictionaryFileStorage&#10;Переименовал метод checkExistFile() на getFile()&#10;Создание и проверку файла обернул в try-catch">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+    <list default="true" id="61735adf-8b79-48fd-8687-69b2b732765b" name="Changes" comment="Разнес чтение и парсинг файла на разные методы">
       <change beforePath="$PROJECT_DIR$/src/service/DictionaryFileStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/DictionaryFileStorage.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -79,7 +77,7 @@
       <workItem from="1643799744254" duration="14255000" />
       <workItem from="1643965502752" duration="1298000" />
       <workItem from="1643972391327" duration="1217000" />
-      <workItem from="1644240963792" duration="10389000" />
+      <workItem from="1644240963792" duration="10874000" />
     </task>
     <task id="LOCAL-00001" summary="Попытка Strategy паттерна -&gt; пока безуспешно">
       <created>1643814088919</created>
@@ -95,7 +93,14 @@
       <option name="project" value="LOCAL" />
       <updated>1644306032195</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Разнес чтение и парсинг файла на разные методы">
+      <created>1644320463749</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1644320463749</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -115,6 +120,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Попытка Strategy паттерна -&gt; пока безуспешно" />
     <MESSAGE value="Поменял название FileService на DictionaryFileStorage&#10;Переименовал метод checkExistFile() на getFile()&#10;Создание и проверку файла обернул в try-catch" />
-    <option name="LAST_COMMIT_MESSAGE" value="Поменял название FileService на DictionaryFileStorage&#10;Переименовал метод checkExistFile() на getFile()&#10;Создание и проверку файла обернул в try-catch" />
+    <MESSAGE value="Разнес чтение и парсинг файла на разные методы" />
+    <option name="LAST_COMMIT_MESSAGE" value="Разнес чтение и парсинг файла на разные методы" />
   </component>
 </project>

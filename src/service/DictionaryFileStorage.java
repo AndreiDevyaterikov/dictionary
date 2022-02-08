@@ -63,15 +63,15 @@ public class DictionaryFileStorage {
         return dictionary;
     }
 
+    public Map<String, String> writeToFile(Map<String, String> dictionary, String pathFile)  {
 
-
-    public Map<String, String> writeToFile(Map<String, String> dictionary, String pathFile) throws IOException {
-
-        FileWriter writer = new FileWriter(getFile(pathFile));
-        for(Map.Entry<String, String> entry : dictionary.entrySet()){
-            writer.write(entry.getKey() + " - " + entry.getValue());
+        try (FileWriter writer = new FileWriter(getFile(pathFile))) {
+            for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                writer.write(entry.getKey() + " - " + entry.getValue());
+            }
+        } catch (IOException e){
+            System.out.println(e.getMessage());
         }
-        writer.close();
         return dictionary;
     }
 }
