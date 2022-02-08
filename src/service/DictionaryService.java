@@ -53,7 +53,7 @@ public class DictionaryService {
     }
 
     public Map<String, String> getDictionary(String pathFile) throws IOException {
-        return dictionaryFileStorage.readFromFile(pathFile);
+        return dictionaryFileStorage.parseBody(pathFile);
     }
 
 }
