@@ -5,7 +5,10 @@ public class Phrase {
     private String word;
     private String translate;
 
-    public Phrase() {
+
+    public Phrase(String word, String translate) {
+        this.word = word;
+        this.translate = translate;
     }
 
     public String getWord() {
@@ -24,4 +27,8 @@ public class Phrase {
         this.translate = translate;
     }
 
+    @Override
+    public String toString() {
+        return word + " - " + translate;
+    }
 }
