@@ -4,6 +4,7 @@ import config.FileConfig;
 import dao.DictionaryDaoImpl;
 import exception.EmptyDictionaryException;
 import exception.ExistWordDictionaryException;
+import exception.FormatDictionaryException;
 import exception.NotFoundWordDictionaryException;
 import model.Phrase;
 
@@ -13,9 +14,9 @@ import java.util.Set;
 
 public class DictionaryServiceImpl implements DictionaryService {
 
-    public String regex;
-
     private final DictionaryDaoImpl dictionaryDao;
+
+    public String regex;
 
     public DictionaryServiceImpl(FileConfig fileConfig, String regex) {
         this.dictionaryDao = new DictionaryDaoImpl(fileConfig);
@@ -24,63 +25,92 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public void addPhrase(Phrase phrase) {
-        var dictionary = getDictionary();
 
         try {
-            if(dictionary.isEmpty()){
-                throw new EmptyDictionaryException();
-            }
-        } catch (EmptyDictionaryException exception){
-            System.out.println(exception.getMessage());
-        }
-            for(Phrase dictionaryPhrase : dictionary){
-                try {
-                    if(phrase.equals(dictionaryPhrase)){
+            checkPattern(phrase.getWord());
+
+            var dictionary = getResult();
+
+            if(!dictionary.isEmpty()){
+                for(Phrase dictionaryPhrase : dictionary){
+                    if(phrase.getWord().equals(dictionaryPhrase.getWord())) {
                         throw new ExistWordDictionaryException(phrase.getWord(), dictionaryPhrase.getTranslate());
                     }
-                } catch (ExistWordDictionaryException exception){
-                    System.out.println(exception.getMessage());
                 }
             }
+            dictionaryDao.write(phrase);
+
+        } catch (FormatDictionaryException | ExistWordDictionaryException exception){
+            System.out.println(exception.getMessage());
+        }
     }
 
+    //TODO Исправить - не работает
     @Override
-    public Set<Phrase> deletePhrase(String word) {
-
-        var dictionary = getDictionary();
+    public void deletePhrase(String word) {
 
         try {
+            checkPattern(word);
+
+            var dictionary = getResult();
+
             if(dictionary.isEmpty()){
                 throw new EmptyDictionaryException();
             }
-        } catch (EmptyDictionaryException exception){
-            System.out.println(exception.getMessage());
-        }
 
-        for(Phrase dictionaryPhrase : dictionary){
-            try {
-                if(word.equals(dictionaryPhrase.getWord())){
-                   dictionary.remove(dictionaryPhrase);
+            for(var phrase : dictionary){
+                if(word.equals(phrase.getWord())){
+                    dictionary.remove(phrase);
                 } else {
                     throw new NotFoundWordDictionaryException(word);
                 }
-            } catch (NotFoundWordDictionaryException exception){
-                System.out.println(exception.getMessage());
             }
+
+            for(var pairWords : dictionary){
+                dictionaryDao.write(pairWords);
+            }
+
+        } catch (FormatDictionaryException  | NotFoundWordDictionaryException | EmptyDictionaryException exception){
+            System.out.println(exception.getMessage());
         }
 
-        return dictionary;
-    }
-
-    @Override
-    public void editPhrase(String word) {
 
     }
 
+    @Override
+    public void editPhrase(Phrase phrase) {
+
+        var dictionary = getResult();
+
+        try {
+            checkPattern(phrase.getWord());
+
+            if(dictionary.isEmpty()){
+                throw new EmptyDictionaryException();
+            }
+
+            for (var dictionaryPhrase : dictionary){
+                if(!phrase.getWord().equals(dictionaryPhrase.getWord())){
+                    throw new NotFoundWordDictionaryException(phrase.getWord());
+                } else {
+                    dictionary.remove(dictionaryPhrase);
+                    dictionary.add(phrase);
+                }
+            }
+
+        } catch (FormatDictionaryException | NotFoundWordDictionaryException | EmptyDictionaryException exception){
+            System.out.println(exception.getMessage());
+        }
+    }
 
     @Override
-    public Set<Phrase> getDictionary() {
-        Set<Phrase> dictionary = null;
+    public void printDictionary() {
+        getResult().forEach(System.out::println);
+    }
+
+    @Override
+    public Set<Phrase> getResult() {
+        Set<Phrase> dictionary = new HashSet<>();
         try {
             var result = dictionaryDao.read();
             if(!result.isEmpty()) {
@@ -89,7 +119,7 @@ public class DictionaryServiceImpl implements DictionaryService {
                  dictionary = new HashSet<>();
 
                 for(var string : strings){
-                    var pairsWords = string.split("-");
+                    var pairsWords = string.split(" - ");
                     dictionary.add(new Phrase(pairsWords[0], pairsWords[1]));
                 }
             }
@@ -97,5 +127,12 @@ public class DictionaryServiceImpl implements DictionaryService {
             System.out.println(exception.getMessage());
         }
         return dictionary;
+    }
+
+    @Override
+    public void checkPattern(String word) throws FormatDictionaryException {
+        if(!word.matches(regex)){
+            throw new FormatDictionaryException(regex);
+        }
     }
 }

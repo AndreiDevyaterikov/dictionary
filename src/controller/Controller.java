@@ -1,8 +1,9 @@
 package controller;
 
+import service.DictionaryServiceImpl;
+
 public interface Controller {
-    void addPhrase();
-    void deletePhrase();
-    void editPhrase();
-    void getDictionary();
+    void addPhrase(DictionaryServiceImpl service);
+    void deletePhrase(DictionaryServiceImpl service);
+    void getDictionary(DictionaryServiceImpl service);
 }

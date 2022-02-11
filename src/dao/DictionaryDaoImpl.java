@@ -1,8 +1,10 @@
 package dao;
 
 import config.FileConfig;
+import model.Phrase;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -33,8 +35,15 @@ public class DictionaryDaoImpl implements DictionaryDao{
     }
 
     @Override
-    public void write() {
+    public void write(Phrase phrase) {
 
+        var file = get();
+        try (FileWriter fileWriter = new FileWriter(file, true)){
+            fileWriter.write(phrase.getWord()+ " - " + phrase.getTranslate());
+            fileWriter.write("\n");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private File get() {
