@@ -39,7 +39,7 @@ public class ControllerImpl implements Controller {
     }
 
     @Override
-    public void addPhrase(DictionaryServiceImpl service) {
+    public Phrase addPhrase(DictionaryServiceImpl service) {
 
         System.out.print("Print word:");
         String word = new Scanner(System.in).nextLine();
@@ -47,7 +47,7 @@ public class ControllerImpl implements Controller {
         System.out.print("Print translate:");
         String translate = new Scanner(System.in).nextLine();
 
-        service.addPhrase(new Phrase(word, translate));
+         return service.addPhrase(new Phrase(word, translate));
 
     }
 

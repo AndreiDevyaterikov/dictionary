@@ -10,6 +10,7 @@ import model.Phrase;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class DictionaryServiceImpl implements DictionaryService {
@@ -24,7 +25,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public void addPhrase(Phrase phrase) {
+    public Phrase addPhrase(Phrase phrase) {
 
         try {
             checkPattern(phrase.getWord());
@@ -38,11 +39,12 @@ public class DictionaryServiceImpl implements DictionaryService {
                     }
                 }
             }
-            dictionaryDao.create(phrase);
 
         } catch (FormatDictionaryException | ExistWordDictionaryException exception){
             System.out.println(exception.getMessage());
         }
+
+        return dictionaryDao.create(phrase);
     }
 
     //TODO Исправить - не работает
@@ -110,19 +112,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Set<Phrase> getResult() {
-        Set<Phrase> dictionary = new HashSet<>();
-        var result = dictionaryDao.read();
-        if(!result.isEmpty()) {
-            var strings = result.split("\n");
-
-             dictionary = new HashSet<>();
-
-            for(var string : strings){
-                var pairsWords = string.split(" - ");
-                dictionary.add(new Phrase(pairsWords[0], pairsWords[1]));
-            }
-        }
-        return dictionary;
+        return dictionaryDao.read();
     }
 
     @Override
