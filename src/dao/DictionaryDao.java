@@ -1,10 +1,16 @@
 package dao;
 
 import model.Phrase;
+import java.util.Set;
 
-import java.io.FileNotFoundException;
 
 public interface DictionaryDao {
-    String read() throws FileNotFoundException;
-    void write(Phrase phrase);
+
+
+    Phrase create(Phrase phrase);
+    Set<Phrase> read() ;
+    void update (String word);
+    void delete(String word);
+    Phrase findByWord(String word);
 }
+
