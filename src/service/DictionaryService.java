@@ -2,11 +2,11 @@ package service;
 
 import exception.FormatDictionaryException;
 import model.Phrase;
+
 import java.util.Set;
 
-
 public interface DictionaryService {
-    Phrase addPhrase(Phrase phrase);
+    void addPhrase(Phrase phrase);
     void deletePhrase(String word);
     void editPhrase(Phrase phrase);
     void printDictionary();

@@ -4,8 +4,6 @@ import model.Phrase;
 import service.DictionaryServiceImpl;
 import service.EnglishDictionaryService;
 import service.NumberDictionaryService;
-
-import java.io.*;
 import java.util.Scanner;
 
 public class ControllerImpl implements Controller {
@@ -41,17 +39,15 @@ public class ControllerImpl implements Controller {
     }
 
     @Override
-    public Phrase addPhrase(DictionaryServiceImpl service) {
+    public void addPhrase(DictionaryServiceImpl service) {
 
-        Console consoleWord = System.console();
         System.out.print("Print word:");
-        String word = consoleWord.readLine();
+        String word = new Scanner(System.in).nextLine();
 
         System.out.print("Print translate:");
-        Console consoleTranslate = System.console();
-        String translate = consoleTranslate.readLine();
+        String translate = new Scanner(System.in).nextLine();
 
-         return service.addPhrase(new Phrase(word, translate));
+        service.addPhrase(new Phrase(word, translate));
 
     }
 

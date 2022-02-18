@@ -1,31 +1,30 @@
 package service;
 
 import config.FileConfig;
-import dao.FileDictionaryDao;
+import dao.DictionaryDaoImpl;
 import exception.EmptyDictionaryException;
 import exception.ExistWordDictionaryException;
 import exception.FormatDictionaryException;
 import exception.NotFoundWordDictionaryException;
 import model.Phrase;
+
+import java.io.FileNotFoundException;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DictionaryServiceImpl implements DictionaryService {
 
-    static Logger LOGGER = Logger.getLogger(DictionaryServiceImpl.class.getName());
-
-    private final FileDictionaryDao dictionaryDao;
+    private final DictionaryDaoImpl dictionaryDao;
 
     public String regex;
 
     public DictionaryServiceImpl(FileConfig fileConfig, String regex) {
-        this.dictionaryDao = new FileDictionaryDao(fileConfig);
+        this.dictionaryDao = new DictionaryDaoImpl(fileConfig);
         this.regex = regex;
     }
 
     @Override
-    public Phrase addPhrase(Phrase phrase) {
+    public void addPhrase(Phrase phrase) {
 
         try {
             checkPattern(phrase.getWord());
@@ -39,11 +38,11 @@ public class DictionaryServiceImpl implements DictionaryService {
                     }
                 }
             }
+            dictionaryDao.write(phrase);
 
         } catch (FormatDictionaryException | ExistWordDictionaryException exception){
-            LOGGER.log(Level.WARNING, exception.getMessage());
+            System.out.println(exception.getMessage());
         }
-        return dictionaryDao.create(phrase);
     }
 
     //TODO Исправить - не работает
@@ -68,7 +67,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             }
 
             for(var pairWords : dictionary){
-                dictionaryDao.create(pairWords);
+                dictionaryDao.write(pairWords);
             }
 
         } catch (FormatDictionaryException  | NotFoundWordDictionaryException | EmptyDictionaryException exception){
@@ -111,7 +110,23 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Set<Phrase> getResult() {
-        return dictionaryDao.read();
+        Set<Phrase> dictionary = new HashSet<>();
+        try {
+            var result = dictionaryDao.read();
+            if(!result.isEmpty()) {
+                var strings = result.split("\n");
+
+                 dictionary = new HashSet<>();
+
+                for(var string : strings){
+                    var pairsWords = string.split(" - ");
+                    dictionary.add(new Phrase(pairsWords[0], pairsWords[1]));
+                }
+            }
+        } catch (FileNotFoundException exception){
+            System.out.println(exception.getMessage());
+        }
+        return dictionary;
     }
 
     @Override
