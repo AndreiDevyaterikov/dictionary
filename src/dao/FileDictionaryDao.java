@@ -69,7 +69,6 @@ public class FileDictionaryDao implements DictionaryDao{
         } catch (IOException exception) {
             LOGGER.log(Level.WARNING, exception.getMessage());
         }
-
         LOGGER.log(Level.INFO, "Phrase - " + phrase.getWord() + " - " + phrase.getTranslate() + " has been added");
         return phrase;
     }

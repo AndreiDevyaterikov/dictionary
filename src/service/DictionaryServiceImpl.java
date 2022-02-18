@@ -7,13 +7,13 @@ import exception.ExistWordDictionaryException;
 import exception.FormatDictionaryException;
 import exception.NotFoundWordDictionaryException;
 import model.Phrase;
-
-import java.io.FileNotFoundException;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DictionaryServiceImpl implements DictionaryService {
+
+    static Logger LOGGER = Logger.getLogger(DictionaryServiceImpl.class.getName());
 
     private final FileDictionaryDao dictionaryDao;
 
@@ -41,9 +41,8 @@ public class DictionaryServiceImpl implements DictionaryService {
             }
 
         } catch (FormatDictionaryException | ExistWordDictionaryException exception){
-            System.out.println(exception.getMessage());
+            LOGGER.log(Level.WARNING, exception.getMessage());
         }
-
         return dictionaryDao.create(phrase);
     }
 
