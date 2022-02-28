@@ -1,8 +1,12 @@
 package dao;
 
-import config.FileConfig;
+import util.TextFileExtension;
 import exception.EmptyDictionaryException;
+import exception.ExistWordDictionaryException;
+import exception.NotFoundWordDictionaryException;
 import model.Phrase;
+import util.DictionaryType;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,68 +19,116 @@ public class FileDictionaryDao implements DictionaryDao{
 
     static Logger LOGGER = Logger.getLogger(FileDictionaryDao.class.getName());
 
-    private final FileConfig fileConfig;
+    private final TextFileExtension textFileExtension;
+    private final DictionaryType dictionaryType;
 
-    public FileDictionaryDao(FileConfig fileConfig) {
-        this.fileConfig = fileConfig;
-    }
-
-
-    @Override
-    public void update(String word) {
-        //TODO Реализация изменения
+    public FileDictionaryDao(TextFileExtension textFileExtension, DictionaryType dictionaryType) {
+        this.textFileExtension = textFileExtension;
+        this.dictionaryType = dictionaryType;
     }
 
     @Override
-    public void delete(String word) {
-        //TODO Реализация удаления
+    public Phrase update(Phrase phrase) {
+
+        var existPhrase = findByWord(phrase.getWord());
+
+        try {
+            if(existPhrase != null){
+                var dictionary = read();
+                if(dictionary.isEmpty()){
+                    throw new EmptyDictionaryException();
+                }
+                dictionary.replace(existPhrase.getWord(), existPhrase.getTranslate(), phrase.getTranslate());
+                //TODO Запись в файл
+
+                LOGGER.log(Level.INFO, "Translate of word " + existPhrase.getWord() + " updated: " + existPhrase.getWord() + " -> " + phrase.getTranslate());
+            } else {
+                throw new NotFoundWordDictionaryException(phrase.getWord());
+            }
+        } catch (NotFoundWordDictionaryException | EmptyDictionaryException exception){
+            LOGGER.log(Level.WARNING, exception.getMessage());
+        }
+        return phrase;
+    }
+
+    @Override
+    public Phrase delete(String word) {
+
+        var existPhrase = findByWord(word);
+
+        try {
+            if(existPhrase != null){
+                var dictionary = read();
+                if(dictionary.isEmpty()){
+                    throw new EmptyDictionaryException();
+                }
+
+                dictionary.remove(existPhrase.getWord(), existPhrase.getTranslate());
+                LOGGER.log(Level.INFO, "Deleted phrase - " + existPhrase);
+                //TODO Запись в файл
+
+
+            } else {
+                throw new NotFoundWordDictionaryException(word);
+            }
+        } catch (NotFoundWordDictionaryException | EmptyDictionaryException exception){
+            LOGGER.log(Level.WARNING, exception.getMessage());
+        }
+        return existPhrase;
     }
 
     @Override
     public Phrase findByWord(String word) {
-
-        var result = read();
-
+        Phrase phrase = new Phrase();
+        var dictionary = read();
         try {
 
-            if(result.isEmpty()){
+            if(dictionary.isEmpty()){
                 throw new EmptyDictionaryException();
             }
-            //TODO Реализация поиска слова
+
+            for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                if(entry.getKey().equals(word)){
+                    phrase.setWord(entry.getKey());
+                    phrase.setTranslate(entry.getValue());
+                    LOGGER.log(Level.INFO, "Find phrase - "  + phrase);
+                    return phrase;
+                }
+            }
 
         } catch (EmptyDictionaryException exception){
-            LOGGER.log(Level.INFO, exception.getMessage());
+            LOGGER.log(Level.WARNING, exception.getMessage());
         }
-
-        return new Phrase("", "");
-
+        return null;
     }
 
     @Override
     public Phrase create(Phrase phrase) {
 
-
         try {
-            var file = getFile();
-            FileWriter fileWriter = new FileWriter(file, true);
+            var existPhrase = findByWord(phrase.getWord());
+            if(existPhrase == null){
+                var file = getFile();
+                FileWriter fileWriter = new FileWriter(file, true);
 
-            fileWriter.write(phrase.getWord()+ " - " + phrase.getTranslate());
-            fileWriter.write("\n");
+                fileWriter.write(phrase.getWord()+ " - " + phrase.getTranslate());
+                fileWriter.write("\n");
+                fileWriter.close();
+                LOGGER.log(Level.INFO, "Phrase - " + phrase.getWord() + " - " + phrase.getTranslate() + " has been added");
+            } else {
+                throw new ExistWordDictionaryException(existPhrase.getWord(), existPhrase.getTranslate());
+            }
 
-            fileWriter.close();
-
-
-        } catch (IOException exception) {
+        } catch (ExistWordDictionaryException | IOException exception) {
             LOGGER.log(Level.WARNING, exception.getMessage());
         }
-        LOGGER.log(Level.INFO, "Phrase - " + phrase.getWord() + " - " + phrase.getTranslate() + " has been added");
         return phrase;
     }
 
     @Override
-    public Set<Phrase> read() {
+    public Map<String, String> read() {
 
-        Set<Phrase> dictionary = new HashSet<>();
+        Map<String, String> dictionary = new HashMap<>();
 
         try {
             var file = getFile();
@@ -88,7 +140,7 @@ public class FileDictionaryDao implements DictionaryDao{
                 String line = scanner.nextLine();
 
                 var pairWords = line.split(" - ");
-                dictionary.add(new Phrase(pairWords[0], pairWords[1]));
+                dictionary.put(pairWords[0], pairWords[1]);
 
             }
             scanner.close();
@@ -99,7 +151,7 @@ public class FileDictionaryDao implements DictionaryDao{
     }
 
     private File getFile() throws IOException {
-        File file = new File(fileConfig.getPathName());
+        File file = new File(dictionaryType.getName() + textFileExtension.getExtension());
         if(file.createNewFile()){
             return file;
         }
