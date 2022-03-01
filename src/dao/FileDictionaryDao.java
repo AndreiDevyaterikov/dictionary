@@ -61,28 +61,7 @@ public class FileDictionaryDao implements DictionaryDao{
         return phrase;
     }
 
-//    private void fileStorageWriter(DictionaryImage dictionaryImage){
-//        var dictionary = dictionaryImage.getDictionary();
-//        var rowNumber = dictionaryImage.getRowNumber();
-//        var phrase = dictionaryImage.getPhrase();
-//        int countSkipRows = 0;
-//        try {
-//            Scanner scanner = new Scanner(getFile());
-//            while((scanner.hasNextLine())){
-//
-//                String line = scanner.nextLine();
-//
-//                var pairWords = line.split(" - ");
-//                dictionary.put(pairWords[0], pairWords[1]);
-//
-//            }
-//            scanner.close();
-//
-//        } catch (IOException exception){
-//            LOGGER.log(Level.WARNING, exception.getMessage());
-//        }
-//
-//    }
+
 
     @Override
     public Phrase delete(String word) {
@@ -120,21 +99,52 @@ public class FileDictionaryDao implements DictionaryDao{
         return existPhrase;
     }
 
-//    private DictionaryImage getDictionaryImage(String word){
-//        Phrase phrase = new Phrase();
-//        var dictionary = read();
-//        int rowNumber = 0;
-//        if(!dictionary.isEmpty()){
-//            for(Map.Entry<String, String> entry : dictionary.entrySet()){
-//                if(entry.getKey().equals(word)){
-//                    phrase.setWord(entry.getKey());
-//                    phrase.setTranslate(entry.getValue());
-//                }
-//            }
-//            return new DictionaryImage(phrase, rowNumber, dictionary);
-//        }
-//        return null;
-//    }
+    private void fileStorageWriter(DictionaryImage dictionaryImage){
+        var dictionary = dictionaryImage.getDictionary();
+        var rowNumber = dictionaryImage.getRowNumber();
+        var phrase = dictionaryImage.getPhrase();
+        int countSkipRows = 0;
+        try {
+            var file = getFile();
+            Scanner scanner = new Scanner(file);
+            while((scanner.hasNextLine())){
+                countSkipRows++;
+                if(countSkipRows == rowNumber){
+                    try (FileWriter fileWriter = new FileWriter(file)) {
+                        for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                            fileWriter.write(entry.getKey() + " - " + entry.getValue());
+                            fileWriter.write("\n");
+                        }
+                    }
+                }
+
+            }
+            scanner.close();
+
+        } catch (IOException exception){
+            LOGGER.log(Level.WARNING, exception.getMessage());
+        }
+
+    }
+
+    private DictionaryImage getDictionaryImage(String word){
+        Phrase phrase = new Phrase();
+        var dictionary = read();
+        int rowNumber = 0;
+        if(!dictionary.isEmpty()){
+            for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                if(entry.getKey().equals(word)){
+                    phrase.setWord(entry.getKey());
+                    phrase.setTranslate(entry.getValue());
+                }
+                rowNumber++;
+                dictionary.remove(entry.getKey(), entry.getValue());
+
+            }
+            return new DictionaryImage(phrase, rowNumber, dictionary);
+        }
+        return null;
+    }
 
     @Override
     public Phrase findByWord(String word) {
