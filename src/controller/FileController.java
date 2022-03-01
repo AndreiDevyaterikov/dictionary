@@ -9,7 +9,6 @@ import util.TextFileExtension;
 
 import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.Phaser;
 
 
 public class FileController{
@@ -18,41 +17,53 @@ public class FileController{
         System.out.println("""
                 Select type dictionary:\s
                 1 - English\s
-                2 - Number\s
-                """);
+                2 - Number""");
         String typeDictionary = new Scanner(System.in).nextLine();
-        switch (typeDictionary){
-            case "1":{
+        switch (typeDictionary) {
+            case "1" -> {
                 DictionaryType englishDictionary = DictionaryType.ENGLISH;
-                actionWithDictionary(englishDictionary);
+                System.out.println(actionWithDictionary(englishDictionary));
+            }
+            case "2" -> {
+                DictionaryType numberDictionary = DictionaryType.NUMBER;
+                System.out.println(actionWithDictionary(numberDictionary));
             }
 
-            case "2":{
-                DictionaryType numberDictionary = DictionaryType.NUMBER;
-                actionWithDictionary(numberDictionary);
+            default -> {
             }
         }
-
     }
 
-    public void actionWithDictionary(DictionaryType dictionaryType){
-        System.out.println("Selected " + dictionaryType.getName() + " dictionary");
+    public Object actionWithDictionary(DictionaryType dictionaryType){
+        System.out.println("Selected " + dictionaryType.getName());
         System.out.println("""
                 Select action:\s
                 1 - Add\s
                 2 - Delete\s
                 3 - Find\s
                 4 - GetAll\s
-                5 - Edit\s
-                """);
+                5 - Edit""");
 
         String typeAction = new Scanner(System.in).nextLine();
         switch (typeAction){
-            case "1" -> addPhrase(dictionaryType);
-            case "2" -> deletePhrase(dictionaryType);
-            case "3" -> findPhrase(dictionaryType);
-            case "4" -> getDictionary(dictionaryType);
-            case "5" -> editPhrase(dictionaryType);
+            case "1" -> {
+                return addPhrase(dictionaryType);
+            }
+            case "2" -> {
+                return deletePhrase(dictionaryType);
+            }
+            case "3" -> {
+                return findPhrase(dictionaryType);
+            }
+            case "4" -> {
+                return getDictionary(dictionaryType);
+            }
+            case "5" -> {
+                return editPhrase(dictionaryType);
+            }
+            default -> {
+                return "Not found action";
+            }
         }
     }
 

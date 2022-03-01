@@ -1,8 +1,6 @@
 package service;
 
 import dao.FileDictionaryDao;
-import exception.EmptyDictionaryException;
-import exception.ExistWordDictionaryException;
 import exception.FormatDictionaryException;
 import exception.NotFoundWordDictionaryException;
 import model.Phrase;
@@ -31,14 +29,17 @@ public class FileDictionaryService implements DictionaryService{
 
         try {
             var checkResult = checkFormatService.checkLanguageDictionary(phrase.getWord(), dictionaryType.getRegex());
-            if(!checkResult){
-                throw new FormatDictionaryException(phrase.getWord());
+            if(checkResult){
+                return fileDictionaryDao.create(phrase);
+            } else {
+                throw new FormatDictionaryException(dictionaryType.getRegex());
             }
 
         } catch (FormatDictionaryException exception){
             LOGGER.log(Level.WARNING, exception.getMessage());
         }
-        return fileDictionaryDao.create(phrase);
+
+        return phrase;
     }
 
     @Override

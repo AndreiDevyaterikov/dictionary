@@ -1,5 +1,6 @@
 package dao;
 
+import model.DictionaryImage;
 import util.TextFileExtension;
 import exception.EmptyDictionaryException;
 import exception.ExistWordDictionaryException;
@@ -39,22 +40,54 @@ public class FileDictionaryDao implements DictionaryDao{
                     throw new EmptyDictionaryException();
                 }
                 dictionary.replace(existPhrase.getWord(), existPhrase.getTranslate(), phrase.getTranslate());
-                //TODO Запись в файл
 
-                LOGGER.log(Level.INFO, "Translate of word " + existPhrase.getWord() + " updated: " + existPhrase.getWord() + " -> " + phrase.getTranslate());
+                var file = getFile();
+                FileWriter fileWriter = new FileWriter(file);
+
+                for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                    fileWriter.write(entry.getKey() + " - " + entry.getValue());
+                    fileWriter.write("\n");
+                }
+
+                fileWriter.close();
+
+                LOGGER.log(Level.INFO, "Translate of word " + existPhrase.getWord() + " updated: " + existPhrase.getTranslate() + " -> " + phrase.getTranslate());
             } else {
                 throw new NotFoundWordDictionaryException(phrase.getWord());
             }
-        } catch (NotFoundWordDictionaryException | EmptyDictionaryException exception){
+        } catch (NotFoundWordDictionaryException | EmptyDictionaryException | IOException exception){
             LOGGER.log(Level.WARNING, exception.getMessage());
         }
         return phrase;
     }
 
+//    private void fileStorageWriter(DictionaryImage dictionaryImage){
+//        var dictionary = dictionaryImage.getDictionary();
+//        var rowNumber = dictionaryImage.getRowNumber();
+//        var phrase = dictionaryImage.getPhrase();
+//        int countSkipRows = 0;
+//        try {
+//            Scanner scanner = new Scanner(getFile());
+//            while((scanner.hasNextLine())){
+//
+//                String line = scanner.nextLine();
+//
+//                var pairWords = line.split(" - ");
+//                dictionary.put(pairWords[0], pairWords[1]);
+//
+//            }
+//            scanner.close();
+//
+//        } catch (IOException exception){
+//            LOGGER.log(Level.WARNING, exception.getMessage());
+//        }
+//
+//    }
+
     @Override
     public Phrase delete(String word) {
 
-        var existPhrase = findByWord(word);
+       var existPhrase = findByWord(word);
 
         try {
             if(existPhrase != null){
@@ -65,28 +98,49 @@ public class FileDictionaryDao implements DictionaryDao{
 
                 dictionary.remove(existPhrase.getWord(), existPhrase.getTranslate());
                 LOGGER.log(Level.INFO, "Deleted phrase - " + existPhrase);
-                //TODO Запись в файл
 
+                var file = getFile();
+                FileWriter fileWriter = new FileWriter(file);
 
+                if(dictionary.isEmpty()){
+                    fileWriter.write("");
+                } else {
+                    for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                        fileWriter.write(entry.getKey() + " - " + entry.getValue());
+                        fileWriter.write("\n");
+                    }
+                }
+                fileWriter.close();
             } else {
                 throw new NotFoundWordDictionaryException(word);
             }
-        } catch (NotFoundWordDictionaryException | EmptyDictionaryException exception){
+        } catch (EmptyDictionaryException | NotFoundWordDictionaryException | IOException exception){
             LOGGER.log(Level.WARNING, exception.getMessage());
         }
         return existPhrase;
     }
 
+//    private DictionaryImage getDictionaryImage(String word){
+//        Phrase phrase = new Phrase();
+//        var dictionary = read();
+//        int rowNumber = 0;
+//        if(!dictionary.isEmpty()){
+//            for(Map.Entry<String, String> entry : dictionary.entrySet()){
+//                if(entry.getKey().equals(word)){
+//                    phrase.setWord(entry.getKey());
+//                    phrase.setTranslate(entry.getValue());
+//                }
+//            }
+//            return new DictionaryImage(phrase, rowNumber, dictionary);
+//        }
+//        return null;
+//    }
+
     @Override
     public Phrase findByWord(String word) {
         Phrase phrase = new Phrase();
         var dictionary = read();
-        try {
-
-            if(dictionary.isEmpty()){
-                throw new EmptyDictionaryException();
-            }
-
+        if(!dictionary.isEmpty()){
             for(Map.Entry<String, String> entry : dictionary.entrySet()){
                 if(entry.getKey().equals(word)){
                     phrase.setWord(entry.getKey());
@@ -95,9 +149,6 @@ public class FileDictionaryDao implements DictionaryDao{
                     return phrase;
                 }
             }
-
-        } catch (EmptyDictionaryException exception){
-            LOGGER.log(Level.WARNING, exception.getMessage());
         }
         return null;
     }
@@ -116,7 +167,9 @@ public class FileDictionaryDao implements DictionaryDao{
                 fileWriter.close();
                 LOGGER.log(Level.INFO, "Phrase - " + phrase.getWord() + " - " + phrase.getTranslate() + " has been added");
             } else {
-                throw new ExistWordDictionaryException(existPhrase.getWord(), existPhrase.getTranslate());
+                if(existPhrase.getWord().equals(phrase.getWord())){
+                    throw new ExistWordDictionaryException(existPhrase.getWord(), existPhrase.getTranslate());
+                }
             }
 
         } catch (ExistWordDictionaryException | IOException exception) {
