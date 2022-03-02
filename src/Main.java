@@ -1,9 +1,10 @@
-import controller.FileController;
+import controller.Controller;
+import service.DictionarySelector;
 
 public class Main {
 
     public static void main(String[] args) {
-        FileController fileController = new FileController();
-        fileController.control();
+        Controller controller = new Controller(new DictionarySelector());
+        controller.selectDictionary();
     }
 }

@@ -1,7 +1,6 @@
 package dao;
 
 import model.DictionaryImage;
-import util.TextFileExtension;
 import exception.EmptyDictionaryException;
 import exception.ExistWordDictionaryException;
 import exception.NotFoundWordDictionaryException;
@@ -20,11 +19,11 @@ public class FileDictionaryDao implements DictionaryDao{
 
     static Logger LOGGER = Logger.getLogger(FileDictionaryDao.class.getName());
 
-    private final TextFileExtension textFileExtension;
     private final DictionaryType dictionaryType;
 
-    public FileDictionaryDao(TextFileExtension textFileExtension, DictionaryType dictionaryType) {
-        this.textFileExtension = textFileExtension;
+    private final String FILE_EXTENSION = ".txt";
+
+    public FileDictionaryDao(DictionaryType dictionaryType) {
         this.dictionaryType = dictionaryType;
     }
 
@@ -214,7 +213,7 @@ public class FileDictionaryDao implements DictionaryDao{
     }
 
     private File getFile() throws IOException {
-        File file = new File(dictionaryType.getName() + textFileExtension.getExtension());
+        File file = new File(dictionaryType.getName() + FILE_EXTENSION);
         if(file.createNewFile()){
             return file;
         }
