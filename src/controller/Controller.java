@@ -21,13 +21,13 @@ public class Controller {
         String typeDictionary = System.console().readLine();
         switch (typeDictionary){
             case "1" -> {
-                DictionaryType english = DictionaryType.ENGLISH;
-                return actionWithDictionary(english);
+                var engDictionary = dictionarySelector.selectDictionary(DictionaryType.ENGLISH);
+                return actionWithDictionary(engDictionary);
             }
 
             case "2" -> {
-                DictionaryType number = DictionaryType.NUMBER;
-                return actionWithDictionary(number);
+                var numDictionary = dictionarySelector.selectDictionary(DictionaryType.NUMBER);
+                return actionWithDictionary(numDictionary);
             }
 
             default -> {
@@ -37,10 +37,9 @@ public class Controller {
 
     }
 
-    public Object actionWithDictionary(DictionaryType dictionaryType){
-        var dictionary = dictionarySelector.selectDictionary(dictionaryType);
+    public Object actionWithDictionary(Dictionary dictionary){
 
-        System.out.println("Selected " + dictionaryType.getName());
+        System.out.println("Selected " + dictionary.getDictionaryName());
         System.out.println("""
                 Select action:\s
                 1 - Add\s

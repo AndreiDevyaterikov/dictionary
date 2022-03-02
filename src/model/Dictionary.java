@@ -19,6 +19,9 @@ public class Dictionary {
         this.checkFormatService = checkFormatService;
     }
 
+    public String getDictionaryName(){
+        return dictionaryType.getName();
+    }
 
     public Phrase addPhrase(String word, String translate){
 
