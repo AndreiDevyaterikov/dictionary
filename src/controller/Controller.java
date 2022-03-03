@@ -1,32 +1,28 @@
 package controller;
 
 import model.Dictionary;
-import service.DictionarySelector;
+import service.DictionaryCreator;
 import util.DictionaryType;
 
 public class Controller {
 
-    DictionarySelector dictionarySelector;
+    DictionaryCreator dictionaryCreator;
 
-    public Controller(DictionarySelector dictionarySelector) {
-        this.dictionarySelector = dictionarySelector;
+    public Controller(DictionaryCreator dictionaryCreator) {
+        this.dictionaryCreator = dictionaryCreator;
     }
 
     public Object selectDictionary(){
-        System.out.println("""
-                Select dictionary\s
-                1 - English\s
-                2 - Number""");
 
         String typeDictionary = System.console().readLine();
         switch (typeDictionary){
             case "1" -> {
-                var engDictionary = dictionarySelector.selectDictionary(DictionaryType.ENGLISH);
+                var engDictionary = dictionaryCreator.createDictionary(DictionaryType.ENGLISH);
                 return actionWithDictionary(engDictionary);
             }
 
             case "2" -> {
-                var numDictionary = dictionarySelector.selectDictionary(DictionaryType.NUMBER);
+                var numDictionary = dictionaryCreator.createDictionary(DictionaryType.NUMBER);
                 return actionWithDictionary(numDictionary);
             }
 

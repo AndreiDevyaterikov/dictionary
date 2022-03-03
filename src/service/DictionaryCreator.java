@@ -4,9 +4,9 @@ import dao.FileDictionaryDao;
 import model.Dictionary;
 import util.DictionaryType;
 
-public class DictionarySelector {
+public class DictionaryCreator {
 
-    public Dictionary selectDictionary(DictionaryType dictionaryType){
+    public Dictionary createDictionary(DictionaryType dictionaryType){
         return new Dictionary(dictionaryType,
                 new FileDictionaryService(new FileDictionaryDao(dictionaryType)),
                 new CheckFormatService());
