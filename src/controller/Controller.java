@@ -1,8 +1,11 @@
 package controller;
 
 import model.Dictionary;
+import model.Phrase;
 import service.DictionaryCreator;
 import util.DictionaryType;
+
+import java.util.Map;
 
 public class Controller {
 
@@ -12,28 +15,24 @@ public class Controller {
         this.dictionaryCreator = dictionaryCreator;
     }
 
-    public Object selectDictionary(){
+    public void selectDictionary(){
 
         String typeDictionary = System.console().readLine();
         switch (typeDictionary){
             case "1" -> {
                 var engDictionary = dictionaryCreator.createDictionary(DictionaryType.ENGLISH);
-                return actionWithDictionary(engDictionary);
+                actionWithDictionary(engDictionary);
             }
 
             case "2" -> {
                 var numDictionary = dictionaryCreator.createDictionary(DictionaryType.NUMBER);
-                return actionWithDictionary(numDictionary);
-            }
-
-            default -> {
-                return "Not found selected dictionary";
+                actionWithDictionary(numDictionary);
             }
         }
 
     }
 
-    public Object actionWithDictionary(Dictionary dictionary){
+    public void actionWithDictionary(Dictionary dictionary){
 
         System.out.println("Selected " + dictionary.getDictionaryName());
         System.out.println("""
@@ -46,52 +45,39 @@ public class Controller {
 
         String action = System.console().readLine();
         switch (action){
-            case "1" -> {
-               return addPhrase(dictionary);
-            }
-            case "2" -> {
-               return deletePhrase(dictionary);
-            }
-            case "3" -> {
-                return findByWord(dictionary);
-            }
-            case "4" -> {
-                return getDictionary(dictionary);
-            }
-            case "5" -> {
-                return editPhrase(dictionary);
-            }
-            default -> {
-                return "Not found action";
-            }
+            case "1" -> addPhrase(dictionary);
+            case "2" -> deletePhrase(dictionary);
+            case "3" -> findByWord(dictionary);
+            case "4" -> getDictionary(dictionary);
+            case "5" -> editPhrase(dictionary);
         }
 
     }
 
-    public Object addPhrase(Dictionary dictionary){
+    public Phrase addPhrase(Dictionary dictionary){
 
         String word = enterWord();
         String translate = enterTranslate();
         return dictionary.addPhrase(word, translate);
     }
 
-    public Object deletePhrase(Dictionary dictionary){
+    public Phrase deletePhrase(Dictionary dictionary){
 
         String word = enterWord();
         return dictionary.deletePhrase(word);
     }
 
-    public Object findByWord(Dictionary dictionary){
+    public Phrase findByWord(Dictionary dictionary){
 
         String word = enterWord();
         return dictionary.findByWord(word);
     }
 
-    public Object getDictionary(Dictionary dictionary){
+    public Map<String, String> getDictionary(Dictionary dictionary){
         return dictionary.getDictionary();
     }
 
-    public Object editPhrase(Dictionary dictionary){
+    public Phrase editPhrase(Dictionary dictionary){
 
         String word = enterWord();
         String newTranslate = enterTranslate();
