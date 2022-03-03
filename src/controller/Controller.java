@@ -70,28 +70,20 @@ public class Controller {
 
     public Object addPhrase(Dictionary dictionary){
 
-        System.out.print("Print word: ");
-        String word = System.console().readLine();
-
-        System.out.print("Print translate: ");
-        String translate = System.console().readLine();
-
+        String word = enterWord();
+        String translate = enterTranslate();
         return dictionary.addPhrase(word, translate);
     }
 
     public Object deletePhrase(Dictionary dictionary){
 
-        System.out.print("Print word: ");
-        String word = System.console().readLine();
-
+        String word = enterWord();
         return dictionary.deletePhrase(word);
     }
 
     public Object findByWord(Dictionary dictionary){
 
-        System.out.print("Print word: ");
-        String word = System.console().readLine();
-
+        String word = enterWord();
         return dictionary.findByWord(word);
     }
 
@@ -101,12 +93,19 @@ public class Controller {
 
     public Object editPhrase(Dictionary dictionary){
 
-        System.out.print("Print word: ");
-        String word = System.console().readLine();
-
-        System.out.print("Print new translate: ");
-        String newTranslate = System.console().readLine();
+        String word = enterWord();
+        String newTranslate = enterTranslate();
 
         return dictionary.editPhrase(word, newTranslate);
+    }
+
+    private String enterWord(){
+        System.out.print("Print word: ");
+        return System.console().readLine();
+    }
+
+    private String enterTranslate(){
+        System.out.print("Print translate: ");
+        return System.console().readLine();
     }
 }
