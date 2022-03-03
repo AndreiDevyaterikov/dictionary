@@ -20,7 +20,7 @@ public class Dictionary {
     }
 
     public String getDictionaryName(){
-        return dictionaryType.getName();
+        return dictionaryType.getTitle();
     }
 
     public Phrase addPhrase(String word, String translate){

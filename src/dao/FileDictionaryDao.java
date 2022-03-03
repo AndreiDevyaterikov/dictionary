@@ -213,7 +213,7 @@ public class FileDictionaryDao implements DictionaryDao{
     }
 
     private File getFile() throws IOException {
-        File file = new File(dictionaryType.getName() + FILE_EXTENSION);
+        File file = new File(dictionaryType.getTitle() + FILE_EXTENSION);
         if(file.createNewFile()){
             return file;
         }
