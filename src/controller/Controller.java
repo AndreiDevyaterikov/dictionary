@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class Controller {
 
+    private final String SPACE = " ";
+    private final String PRINT = "Print";
+    private final String WORD = "Word";
+    private final String TRANSLATE = "Translate";
+
     DictionaryCreator dictionaryCreator;
 
     public Controller(DictionaryCreator dictionaryCreator) {
@@ -56,20 +61,20 @@ public class Controller {
 
     public Phrase addPhrase(Dictionary dictionary){
 
-        String word = enterWord();
-        String translate = enterTranslate();
+        String word = enterWordOrTranslate(PRINT + SPACE + WORD);
+        String translate = enterWordOrTranslate(PRINT + SPACE + TRANSLATE);
         return dictionary.addPhrase(word, translate);
     }
 
     public Phrase deletePhrase(Dictionary dictionary){
 
-        String word = enterWord();
+        String word = enterWordOrTranslate(PRINT + SPACE + WORD);
         return dictionary.deletePhrase(word);
     }
 
     public Phrase findByWord(Dictionary dictionary){
 
-        String word = enterWord();
+        String word = enterWordOrTranslate(PRINT + SPACE + WORD);
         return dictionary.findByWord(word);
     }
 
@@ -79,19 +84,14 @@ public class Controller {
 
     public Phrase editPhrase(Dictionary dictionary){
 
-        String word = enterWord();
-        String newTranslate = enterTranslate();
+        String word = enterWordOrTranslate(PRINT + SPACE + WORD);
+        String newTranslate = enterWordOrTranslate(PRINT + SPACE + TRANSLATE);
 
         return dictionary.editPhrase(word, newTranslate);
     }
 
-    private String enterWord(){
-        System.out.print("Print word: ");
-        return System.console().readLine();
-    }
-
-    private String enterTranslate(){
-        System.out.print("Print translate: ");
+    private String enterWordOrTranslate(String message){
+        System.out.println(message);
         return System.console().readLine();
     }
 }
