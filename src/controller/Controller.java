@@ -3,16 +3,19 @@ package controller;
 import model.Dictionary;
 import model.Phrase;
 import service.DictionaryCreator;
-import util.DictionaryType;
+import util.DictionaryMethods;
 
 import java.util.Map;
 
 public class Controller {
 
+    private final String SPLITTER = " - ";
     private final String SPACE = " ";
-    private final String PRINT = "Print";
-    private final String WORD = "Word";
-    private final String TRANSLATE = "Translate";
+    private final String PRINT_WORD = "Print word";
+    private final String PRINT_TRANSLATE = "Print translate";
+    private final String SELECT_DICTIONARY = "Select dictionary";
+    private final String SELECT_ACTION = "Select action";
+    private final String SELECTED = "Selected";
 
     DictionaryCreator dictionaryCreator;
 
@@ -22,59 +25,59 @@ public class Controller {
 
     public void selectDictionary(){
 
-        String typeDictionary = System.console().readLine();
-        switch (typeDictionary){
-            case "1" -> {
-                var engDictionary = dictionaryCreator.createDictionary(DictionaryType.ENGLISH);
-                actionWithDictionary(engDictionary);
-            }
-
-            case "2" -> {
-                var numDictionary = dictionaryCreator.createDictionary(DictionaryType.NUMBER);
-                actionWithDictionary(numDictionary);
-            }
+        System.out.println(SELECT_DICTIONARY);
+        for(var dictionary : dictionaryCreator.getDictionaries()){
+            System.out.println(dictionary.getDictionaryType().getPosition() + SPLITTER + dictionary.getDictionaryType().getTitle());
         }
 
+        String typeDictionary = System.console().readLine();
+        for(var dictionary : dictionaryCreator.getDictionaries()){
+            var dictionaryPosition = dictionary.getDictionaryType().getPosition();
+            if(typeDictionary.equals(dictionaryPosition)){
+                selectAction(dictionary);
+            }
+        }
     }
 
-    public void actionWithDictionary(Dictionary dictionary){
+    public void selectAction(Dictionary dictionary){
 
-        System.out.println("Selected " + dictionary.getDictionaryName());
-        System.out.println("""
-                Select action:\s
-                1 - Add\s
-                2 - Delete\s
-                3 - Find\s
-                4 - Get all\s
-                5 - Edit""");
+        System.out.println(SELECTED + SPACE + dictionary.getDictionaryType().getTitle());
+        System.out.println(SELECT_ACTION);
+        for(var dictionaryMethod : DictionaryMethods.values()){
+            System.out.println(dictionaryMethod.getMethodPosition() + SPLITTER + dictionaryMethod.getMethodTitle());
+        }
 
         String action = System.console().readLine();
-        switch (action){
-            case "1" -> addPhrase(dictionary);
-            case "2" -> deletePhrase(dictionary);
-            case "3" -> findByWord(dictionary);
-            case "4" -> getDictionary(dictionary);
-            case "5" -> editPhrase(dictionary);
+        for(var dictionaryMethod : DictionaryMethods.values()){
+            if(action.equals(dictionaryMethod.getMethodPosition())){
+                switch (dictionaryMethod){
+                    case ADD -> addPhrase(dictionary);
+                    case DELETE -> deletePhrase(dictionary);
+                    case FIND_BY_WORD -> findByWord(dictionary);
+                    case UPDATE -> editPhrase(dictionary);
+                    case GET_DICTIONARY -> getDictionary(dictionary);
+                }
+            }
         }
-
     }
+
 
     public Phrase addPhrase(Dictionary dictionary){
 
-        String word = enterWordOrTranslate(PRINT + SPACE + WORD);
-        String translate = enterWordOrTranslate(PRINT + SPACE + TRANSLATE);
+        String word = enterString(PRINT_WORD);
+        String translate = enterString(PRINT_TRANSLATE);
         return dictionary.addPhrase(word, translate);
     }
 
     public Phrase deletePhrase(Dictionary dictionary){
 
-        String word = enterWordOrTranslate(PRINT + SPACE + WORD);
+        String word = enterString(PRINT_WORD);
         return dictionary.deletePhrase(word);
     }
 
     public Phrase findByWord(Dictionary dictionary){
 
-        String word = enterWordOrTranslate(PRINT + SPACE + WORD);
+        String word = enterString(PRINT_WORD);
         return dictionary.findByWord(word);
     }
 
@@ -84,13 +87,13 @@ public class Controller {
 
     public Phrase editPhrase(Dictionary dictionary){
 
-        String word = enterWordOrTranslate(PRINT + SPACE + WORD);
-        String newTranslate = enterWordOrTranslate(PRINT + SPACE + TRANSLATE);
+        String word = enterString(PRINT_WORD);
+        String newTranslate = enterString(PRINT_TRANSLATE);
 
         return dictionary.editPhrase(word, newTranslate);
     }
 
-    private String enterWordOrTranslate(String message){
+    private String enterString(String message){
         System.out.println(message);
         return System.console().readLine();
     }
