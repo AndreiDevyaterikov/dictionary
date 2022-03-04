@@ -7,8 +7,8 @@ import util.DictionaryType;
 public class DictionaryCreator {
 
     public Dictionary createDictionary(DictionaryType dictionaryType){
-        return new Dictionary(dictionaryType,
-                new FileDictionaryService(new FileDictionaryDao(dictionaryType)),
+        return new Dictionary(new FileDictionaryDao(dictionaryType),
+                dictionaryType,
                 new CheckFormatService());
     }
 }

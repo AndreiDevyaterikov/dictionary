@@ -1,7 +1,7 @@
 package model;
 
+import dao.DictionaryDao;
 import service.CheckFormatService;
-import service.DictionaryService;
 import util.DictionaryType;
 
 import java.util.Map;
@@ -9,13 +9,13 @@ import java.util.Map;
 public class Dictionary {
 
 
+    DictionaryDao dictionaryDao;
     DictionaryType dictionaryType;
-    DictionaryService dictionaryService;
     CheckFormatService checkFormatService;
 
-    public Dictionary(DictionaryType dictionaryType, DictionaryService dictionaryService, CheckFormatService checkFormatService) {
+    public Dictionary(DictionaryDao dictionaryDao, DictionaryType dictionaryType, CheckFormatService checkFormatService) {
+        this.dictionaryDao = dictionaryDao;
         this.dictionaryType = dictionaryType;
-        this.dictionaryService = dictionaryService;
         this.checkFormatService = checkFormatService;
     }
 
@@ -27,31 +27,31 @@ public class Dictionary {
 
         checkFormatService.checkLanguageDictionary(word, dictionaryType.getRegex());
 
-        return dictionaryService.addPhrase(new Phrase(word, translate));
+        return dictionaryDao.create(new Phrase(word, translate));
     }
 
     public Phrase deletePhrase(String word){
 
         checkFormatService.checkLanguageDictionary(word, dictionaryType.getRegex());
 
-        return dictionaryService.deletePhrase(word);
+        return dictionaryDao.delete(word);
     }
 
     public Phrase editPhrase(String word, String newTranslate){
 
         checkFormatService.checkLanguageDictionary(word, dictionaryType.getRegex());
 
-        return dictionaryService.editPhrase(new Phrase(word, newTranslate));
+        return dictionaryDao.update(new Phrase(word, newTranslate));
     }
 
     public Phrase findByWord(String word){
 
         checkFormatService.checkLanguageDictionary(word, dictionaryType.getRegex());
 
-        return dictionaryService.findByWord(word);
+        return dictionaryDao.findByWord(word);
     }
 
     public Map<String, String> getDictionary(){
-        return dictionaryService.getResult();
+        return dictionaryDao.read();
     }
 }
