@@ -1,6 +1,9 @@
 package model;
 
 import dao.DictionaryDao;
+import exception.EmptyDictionaryException;
+import exception.ExistWordDictionaryException;
+import exception.NotFoundWordDictionaryException;
 import service.CheckFormatService;
 import util.DictionaryType;
 
@@ -26,7 +29,12 @@ public class Dictionary {
 
         var correctFormat = checkFormatService.checkWordTranslateDictionary(word, dictionaryType.getRegexWord());
         if(correctFormat){
-            return new ResponseMessage<>(dictionaryDao.create(new Phrase(word, translate)));
+            try {
+                var phrase = dictionaryDao.create(new Phrase(word, translate));
+                return new ResponseMessage<>(phrase);
+            } catch (ExistWordDictionaryException exception){
+                return new ResponseMessage<>(exception.getMessage());
+            }
         }
         return new ResponseMessage<>(dictionaryType.getDescription());
     }
@@ -35,7 +43,11 @@ public class Dictionary {
 
         var correctFormat = checkFormatService.checkWordTranslateDictionary(word, dictionaryType.getRegexWord());
         if(correctFormat){
-            return new ResponseMessage<>(dictionaryDao.delete(word));
+            try {
+                return new ResponseMessage<>(dictionaryDao.delete(word));
+            } catch (EmptyDictionaryException | NotFoundWordDictionaryException exception){
+                return new ResponseMessage<>(exception.getMessage());
+            }
         }
         return new ResponseMessage<>(dictionaryType.getDescription());
     }
@@ -44,7 +56,12 @@ public class Dictionary {
 
         var correctFormat = checkFormatService.checkWordTranslateDictionary(word, dictionaryType.getRegexWord());
         if(correctFormat){
-            return new ResponseMessage<>(dictionaryDao.update(new Phrase(word, newTranslate)));
+            try {
+                var updatedPhrase = dictionaryDao.update(new Phrase(word, newTranslate));
+                return new ResponseMessage<>(updatedPhrase);
+            } catch (EmptyDictionaryException | NotFoundWordDictionaryException exception) {
+                return new ResponseMessage<>(exception.getMessage());
+            }
         }
         return new ResponseMessage<>(dictionaryType.getDescription());
     }
@@ -52,7 +69,11 @@ public class Dictionary {
     public ResponseMessage findByWord(String word){
         var correctFormat = checkFormatService.checkWordTranslateDictionary(word, dictionaryType.getRegexWord());
         if(correctFormat){
-            return new ResponseMessage<>(dictionaryDao.findByWord(word));
+            var phrase = dictionaryDao.findByWord(word);
+            if(phrase.isEmpty()){
+                return new ResponseMessage<>("Not found word");
+            }
+            return new ResponseMessage<>(phrase.get());
         }
         return new ResponseMessage<>(dictionaryType.getDescription());
     }

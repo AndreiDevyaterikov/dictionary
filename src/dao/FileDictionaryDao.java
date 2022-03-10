@@ -6,6 +6,7 @@ import exception.ExistWordDictionaryException;
 import exception.NotFoundWordDictionaryException;
 import model.Phrase;
 import util.DictionaryType;
+import util.TypesOfWrite;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -37,72 +38,56 @@ public class FileDictionaryDao implements DictionaryDao{
     }
 
     @Override
-    public Phrase update(Phrase phrase) {
+    public Phrase update(Phrase newPhrase) throws EmptyDictionaryException, NotFoundWordDictionaryException {
 
-        var existPhrase = findByWord(phrase.getWord());
+        var existPhrase = findByWord(newPhrase.getWord());
 
-        try {
-            if(existPhrase != null){
-                var dictionary = read();
-                if(dictionary.isEmpty()){
-                    throw new EmptyDictionaryException();
-                }
-                dictionary.replace(existPhrase.getWord(), existPhrase.getTranslate(), phrase.getTranslate());
-
-                var file = getFile();
-                FileWriter fileWriter = new FileWriter(file);
-
-                for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                    fileWriter.write(entry.getKey() + SPLITTER + entry.getValue());
-                    fileWriter.write("\n");
-                }
-
-                fileWriter.close();
-
-                LOGGER.log(Level.INFO, TRANSLATE + SPACE + existPhrase.getWord() + UPDATED + SPACE + existPhrase.getTranslate() + ARROW + phrase.getTranslate());
-            } else {
-                throw new NotFoundWordDictionaryException(phrase.getWord());
+        if(existPhrase.isPresent()){
+            var dictionary = read();
+            if(dictionary.isEmpty()){
+                throw new EmptyDictionaryException();
             }
-        } catch (NotFoundWordDictionaryException | EmptyDictionaryException | IOException exception){
-            LOGGER.log(Level.WARNING, exception.getMessage());
+            var oldPhrase = existPhrase.get();
+            dictionary.replace(oldPhrase.getWord(), oldPhrase.getTranslate(), newPhrase.getTranslate());
+            LOGGER.log(Level.INFO, TRANSLATE + SPACE + oldPhrase.getWord() + UPDATED + SPACE + oldPhrase.getTranslate() + ARROW + newPhrase.getTranslate());
+
+            for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                fileWriter(new Phrase(entry.getKey(), entry.getValue()), TypesOfWrite.NEW_OR_UPDATE);
+            }
+
+            return newPhrase;
+
+        } else {
+            throw new NotFoundWordDictionaryException(newPhrase.getWord());
         }
-        return phrase;
     }
 
 
 
     @Override
-    public Phrase delete(String word) {
+    public Optional<Phrase> delete(String word) throws EmptyDictionaryException, NotFoundWordDictionaryException{
 
        var existPhrase = findByWord(word);
 
-        try {
-            if(existPhrase != null){
-                var dictionary = read();
-                if(dictionary.isEmpty()){
-                    throw new EmptyDictionaryException();
-                }
-
-                dictionary.remove(existPhrase.getWord(), existPhrase.getTranslate());
-                LOGGER.log(Level.INFO, DELETED + SPACE + existPhrase);
-
-                var file = getFile();
-                FileWriter fileWriter = new FileWriter(file);
-
-                if(dictionary.isEmpty()){
-                    fileWriter.write("");
-                } else {
-                    for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                        fileWriter.write(entry.getKey() + SPLITTER + entry.getValue());
-                        fileWriter.write("\n");
-                    }
-                }
-                fileWriter.close();
-            } else {
-                throw new NotFoundWordDictionaryException(word);
+        if(existPhrase.isPresent()){
+            var phrase = existPhrase.get();
+            var dictionary = read();
+            if(dictionary.isEmpty()){
+                throw new EmptyDictionaryException();
             }
-        } catch (EmptyDictionaryException | NotFoundWordDictionaryException | IOException exception){
-            LOGGER.log(Level.WARNING, exception.getMessage());
+
+            dictionary.remove(phrase.getWord(), phrase.getTranslate());
+            LOGGER.log(Level.INFO, DELETED + SPACE + phrase);
+
+            if(dictionary.isEmpty()){
+                fileWriter(null, TypesOfWrite.DELETE);
+            } else {
+                for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                    fileWriter(new Phrase(entry.getKey(), entry.getValue()), TypesOfWrite.DELETE);
+                }
+            }
+        } else {
+            throw new NotFoundWordDictionaryException(word);
         }
         return existPhrase;
     }
@@ -155,7 +140,7 @@ public class FileDictionaryDao implements DictionaryDao{
     }
 
     @Override
-    public Phrase findByWord(String word) {
+    public Optional<Phrase> findByWord(String word) {
         Phrase phrase = new Phrase();
         var dictionary = read();
         if(!dictionary.isEmpty()){
@@ -164,36 +149,25 @@ public class FileDictionaryDao implements DictionaryDao{
                     phrase.setWord(entry.getKey());
                     phrase.setTranslate(entry.getValue());
                     LOGGER.log(Level.INFO, FIND + SPLITTER  + phrase);
-                    return phrase;
+                    return Optional.of(phrase);
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public Phrase create(Phrase phrase) {
+    public Phrase create(Phrase newPhrase) throws ExistWordDictionaryException{
 
-        try {
-            var existPhrase = findByWord(phrase.getWord());
-            if(existPhrase == null){
-                var file = getFile();
-                FileWriter fileWriter = new FileWriter(file, true);
-
-                fileWriter.write(phrase.getWord()+ SPLITTER + phrase.getTranslate());
-                fileWriter.write("\n");
-                fileWriter.close();
-                LOGGER.log(Level.INFO, PHRASE + SPLITTER + phrase.getWord() + SPLITTER + phrase.getTranslate() + SPACE + ADDED);
-            } else {
-                if(existPhrase.getWord().equals(phrase.getWord())){
-                    throw new ExistWordDictionaryException(existPhrase.getWord(), existPhrase.getTranslate());
-                }
-            }
-
-        } catch (ExistWordDictionaryException | IOException exception) {
-            LOGGER.log(Level.WARNING, exception.getMessage());
+        var existPhrase = findByWord(newPhrase.getWord());
+        if(existPhrase.isEmpty()){
+            fileWriter(newPhrase, TypesOfWrite.NEW_OR_UPDATE);
+            LOGGER.log(Level.INFO, PHRASE + SPLITTER + newPhrase.getWord() + SPLITTER + newPhrase.getTranslate() + SPACE + ADDED);
+            return newPhrase;
+        } else {
+            var phrase = existPhrase.get();
+            throw new ExistWordDictionaryException(phrase.getWord(), phrase.getTranslate());
         }
-        return phrase;
     }
 
     @Override
@@ -229,4 +203,31 @@ public class FileDictionaryDao implements DictionaryDao{
         return file;
     }
 
+    private void fileWriter(Phrase phrase, TypesOfWrite typesOfWrite){
+       try {
+           var file = getFile();
+           FileWriter fileWriter = new FileWriter(file, true);
+
+           switch (typesOfWrite){
+               case NEW_OR_UPDATE -> {
+                   fileWriter.write(phrase.getWord()+ SPLITTER + phrase.getTranslate());
+                   fileWriter.write("\n");
+               }
+
+               case DELETE -> {
+                   if(phrase == null){
+                       fileWriter.write("");
+                   } else {
+                       fileWriter.write(phrase.getWord() + SPLITTER + phrase.getTranslate());
+                   }
+                   fileWriter.write("\n");
+               }
+           }
+
+           fileWriter.close();
+
+       } catch (IOException exception){
+           LOGGER.log(Level.WARNING, exception.getMessage());
+       }
+    }
 }
