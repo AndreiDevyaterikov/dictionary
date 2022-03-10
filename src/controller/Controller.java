@@ -1,11 +1,11 @@
 package controller;
 
 import model.Dictionary;
-import model.Phrase;
+import model.ResponseMessage;
 import service.DictionaryCreator;
 import util.DictionaryMethods;
 
-import java.util.Map;
+import java.util.Scanner;
 
 public class Controller {
 
@@ -30,7 +30,8 @@ public class Controller {
             System.out.println(dictionary.getDictionaryType().getPosition() + SPLITTER + dictionary.getDictionaryType().getTitle());
         }
 
-        String typeDictionary = System.console().readLine();
+//        String typeDictionary = System.console().readLine();
+        String typeDictionary = new Scanner(System.in).nextLine();
         for(var dictionary : dictionaryCreator.getDictionaries()){
             var dictionaryPosition = dictionary.getDictionaryType().getPosition();
             if(typeDictionary.equals(dictionaryPosition)){
@@ -47,54 +48,58 @@ public class Controller {
             System.out.println(dictionaryMethod.getMethodPosition() + SPLITTER + dictionaryMethod.getMethodTitle());
         }
 
-        String action = System.console().readLine();
+//        String action = System.console().readLine();
+        String action = new Scanner(System.in).nextLine();
         for(var dictionaryMethod : DictionaryMethods.values()){
             if(action.equals(dictionaryMethod.getMethodPosition())){
                 switch (dictionaryMethod){
-                    case ADD -> addPhrase(dictionary);
-                    case DELETE -> deletePhrase(dictionary);
-                    case FIND_BY_WORD -> findByWord(dictionary);
-                    case UPDATE -> editPhrase(dictionary);
-                    case GET_DICTIONARY -> getDictionary(dictionary);
+//                    case ADD -> addPhrase(dictionary);
+//                    case DELETE -> deletePhrase(dictionary);
+//                    case FIND_BY_WORD -> findByWord(dictionary);
+//                    case UPDATE -> editPhrase(dictionary);
+//                    case GET_DICTIONARY -> getDictionary(dictionary);
+
+                    case ADD -> System.out.println(addPhrase(dictionary));
+                    case DELETE -> System.out.println(deletePhrase(dictionary));
+                    case FIND_BY_WORD -> System.out.println(findByWord(dictionary));
+                    case UPDATE -> System.out.println(editPhrase(dictionary));
+                    case GET_DICTIONARY -> System.out.println(getDictionary(dictionary));
                 }
             }
         }
     }
 
 
-    public Phrase addPhrase(Dictionary dictionary){
+    public ResponseMessage addPhrase(Dictionary dictionary){
 
         String word = enterString(PRINT_WORD);
         String translate = enterString(PRINT_TRANSLATE);
         return dictionary.addPhrase(word, translate);
     }
 
-    public Phrase deletePhrase(Dictionary dictionary){
-
+    public ResponseMessage deletePhrase(Dictionary dictionary){
         String word = enterString(PRINT_WORD);
         return dictionary.deletePhrase(word);
     }
 
-    public Phrase findByWord(Dictionary dictionary){
-
+    public ResponseMessage findByWord(Dictionary dictionary){
         String word = enterString(PRINT_WORD);
         return dictionary.findByWord(word);
     }
 
-    public Map<String, String> getDictionary(Dictionary dictionary){
+    public ResponseMessage getDictionary(Dictionary dictionary){
         return dictionary.getDictionary();
     }
 
-    public Phrase editPhrase(Dictionary dictionary){
-
+    public ResponseMessage editPhrase(Dictionary dictionary){
         String word = enterString(PRINT_WORD);
         String newTranslate = enterString(PRINT_TRANSLATE);
-
         return dictionary.editPhrase(word, newTranslate);
     }
 
     private String enterString(String message){
         System.out.println(message);
-        return System.console().readLine();
+//        return System.console().readLine();
+        return new Scanner(System.in).nextLine();
     }
 }

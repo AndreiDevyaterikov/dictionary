@@ -22,6 +22,15 @@ public class FileDictionaryDao implements DictionaryDao{
     private final DictionaryType dictionaryType;
 
     private final String FILE_EXTENSION = ".txt";
+    private final String SPLITTER = " - ";
+    private final String ARROW = " -> ";
+    private final String TRANSLATE = "Translate of word";
+    private final String SPACE = " ";
+    private final String UPDATED = "updated:";
+    private final String DELETED = "Deleted phrase";
+    private final String FIND = "Find phrase";
+    private final String ADDED = "Has been added";
+    private final String PHRASE = "Phrase";
 
     public FileDictionaryDao(DictionaryType dictionaryType) {
         this.dictionaryType = dictionaryType;
@@ -44,13 +53,13 @@ public class FileDictionaryDao implements DictionaryDao{
                 FileWriter fileWriter = new FileWriter(file);
 
                 for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                    fileWriter.write(entry.getKey() + " - " + entry.getValue());
+                    fileWriter.write(entry.getKey() + SPLITTER + entry.getValue());
                     fileWriter.write("\n");
                 }
 
                 fileWriter.close();
 
-                LOGGER.log(Level.INFO, "Translate of word " + existPhrase.getWord() + " updated: " + existPhrase.getTranslate() + " -> " + phrase.getTranslate());
+                LOGGER.log(Level.INFO, TRANSLATE + SPACE + existPhrase.getWord() + UPDATED + SPACE + existPhrase.getTranslate() + ARROW + phrase.getTranslate());
             } else {
                 throw new NotFoundWordDictionaryException(phrase.getWord());
             }
@@ -75,7 +84,7 @@ public class FileDictionaryDao implements DictionaryDao{
                 }
 
                 dictionary.remove(existPhrase.getWord(), existPhrase.getTranslate());
-                LOGGER.log(Level.INFO, "Deleted phrase - " + existPhrase);
+                LOGGER.log(Level.INFO, DELETED + SPACE + existPhrase);
 
                 var file = getFile();
                 FileWriter fileWriter = new FileWriter(file);
@@ -84,7 +93,7 @@ public class FileDictionaryDao implements DictionaryDao{
                     fileWriter.write("");
                 } else {
                     for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                        fileWriter.write(entry.getKey() + " - " + entry.getValue());
+                        fileWriter.write(entry.getKey() + SPLITTER + entry.getValue());
                         fileWriter.write("\n");
                     }
                 }
@@ -111,7 +120,7 @@ public class FileDictionaryDao implements DictionaryDao{
                 if(countSkipRows == rowNumber){
                     try (FileWriter fileWriter = new FileWriter(file)) {
                         for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                            fileWriter.write(entry.getKey() + " - " + entry.getValue());
+                            fileWriter.write(entry.getKey() + SPLITTER + entry.getValue());
                             fileWriter.write("\n");
                         }
                     }
@@ -154,7 +163,7 @@ public class FileDictionaryDao implements DictionaryDao{
                 if(entry.getKey().equals(word)){
                     phrase.setWord(entry.getKey());
                     phrase.setTranslate(entry.getValue());
-                    LOGGER.log(Level.INFO, "Find phrase - "  + phrase);
+                    LOGGER.log(Level.INFO, FIND + SPLITTER  + phrase);
                     return phrase;
                 }
             }
@@ -171,10 +180,10 @@ public class FileDictionaryDao implements DictionaryDao{
                 var file = getFile();
                 FileWriter fileWriter = new FileWriter(file, true);
 
-                fileWriter.write(phrase.getWord()+ " - " + phrase.getTranslate());
+                fileWriter.write(phrase.getWord()+ SPLITTER + phrase.getTranslate());
                 fileWriter.write("\n");
                 fileWriter.close();
-                LOGGER.log(Level.INFO, "Phrase - " + phrase.getWord() + " - " + phrase.getTranslate() + " has been added");
+                LOGGER.log(Level.INFO, PHRASE + SPLITTER + phrase.getWord() + SPLITTER + phrase.getTranslate() + SPACE + ADDED);
             } else {
                 if(existPhrase.getWord().equals(phrase.getWord())){
                     throw new ExistWordDictionaryException(existPhrase.getWord(), existPhrase.getTranslate());
@@ -201,7 +210,7 @@ public class FileDictionaryDao implements DictionaryDao{
 
                 String line = scanner.nextLine();
 
-                var pairWords = line.split(" - ");
+                var pairWords = line.split(SPLITTER);
                 dictionary.put(pairWords[0], pairWords[1]);
 
             }

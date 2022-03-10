@@ -4,10 +4,9 @@ import dao.DictionaryDao;
 import service.CheckFormatService;
 import util.DictionaryType;
 
-import java.util.Map;
-
 public class Dictionary {
 
+    private final String EMPTY = "Empty dictionary";
 
     DictionaryDao dictionaryDao;
     DictionaryType dictionaryType;
@@ -23,35 +22,47 @@ public class Dictionary {
         return dictionaryType;
     }
 
-    public Phrase addPhrase(String word, String translate){
+    public ResponseMessage addPhrase(String word, String translate){
 
-        checkFormatService.checkLanguageDictionary(word, dictionaryType.getRegex());
-
-        return dictionaryDao.create(new Phrase(word, translate));
+        var correctFormat = checkFormatService.checkWordTranslateDictionary(word, dictionaryType.getRegexWord());
+        if(correctFormat){
+            return new ResponseMessage<>(dictionaryDao.create(new Phrase(word, translate)));
+        }
+        return new ResponseMessage<>(dictionaryType.getDescription());
     }
 
-    public Phrase deletePhrase(String word){
+    public ResponseMessage deletePhrase(String word){
 
-        checkFormatService.checkLanguageDictionary(word, dictionaryType.getRegex());
-
-        return dictionaryDao.delete(word);
+        var correctFormat = checkFormatService.checkWordTranslateDictionary(word, dictionaryType.getRegexWord());
+        if(correctFormat){
+            return new ResponseMessage<>(dictionaryDao.delete(word));
+        }
+        return new ResponseMessage<>(dictionaryType.getDescription());
     }
 
-    public Phrase editPhrase(String word, String newTranslate){
+    public ResponseMessage editPhrase(String word, String newTranslate){
 
-        checkFormatService.checkLanguageDictionary(word, dictionaryType.getRegex());
-
-        return dictionaryDao.update(new Phrase(word, newTranslate));
+        var correctFormat = checkFormatService.checkWordTranslateDictionary(word, dictionaryType.getRegexWord());
+        if(correctFormat){
+            return new ResponseMessage<>(dictionaryDao.update(new Phrase(word, newTranslate)));
+        }
+        return new ResponseMessage<>(dictionaryType.getDescription());
     }
 
-    public Phrase findByWord(String word){
-
-        checkFormatService.checkLanguageDictionary(word, dictionaryType.getRegex());
-
-        return dictionaryDao.findByWord(word);
+    public ResponseMessage findByWord(String word){
+        var correctFormat = checkFormatService.checkWordTranslateDictionary(word, dictionaryType.getRegexWord());
+        if(correctFormat){
+            return new ResponseMessage<>(dictionaryDao.findByWord(word));
+        }
+        return new ResponseMessage<>(dictionaryType.getDescription());
     }
 
-    public Map<String, String> getDictionary(){
-        return dictionaryDao.read();
+    public ResponseMessage getDictionary(){
+        var dictionary = dictionaryDao.read();
+        if(dictionary.isEmpty()){
+            return new ResponseMessage<>(EMPTY);
+        }
+        return new ResponseMessage<>(dictionary);
     }
 }
+
