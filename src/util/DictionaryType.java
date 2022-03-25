@@ -1,6 +1,7 @@
 package util;
 
 public enum DictionaryType {
+
     ENGLISH("1", "[a-zA-Z]+", "[а-яА-Я]+", "EnglishDictionary", "Supports only english words"),
     NUMBER("2", "[0-9]+", "[а-яА-Я]+","NumberDictionary", "Supports only number words");
 
