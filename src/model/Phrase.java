@@ -5,6 +5,8 @@ public class Phrase {
     private String word;
     private String translate;
 
+    public Phrase() {
+    }
 
     public Phrase(String word, String translate) {
         this.word = word;
