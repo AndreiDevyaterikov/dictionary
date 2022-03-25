@@ -3,7 +3,6 @@ package model;
 public class ResponseMessage <T>{
     private final T answer;
 
-
     public ResponseMessage(T answer) {
         this.answer = answer;
     }

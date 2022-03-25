@@ -9,7 +9,7 @@ import util.DictionaryType;
 
 public class Dictionary {
 
-    private final String EMPTY = "Empty dictionary";
+    private final String EMPTY_DICTIONARY = "Empty dictionary";
 
     DictionaryDao dictionaryDao;
     DictionaryType dictionaryType;
@@ -81,7 +81,7 @@ public class Dictionary {
     public ResponseMessage getDictionary(){
         var dictionary = dictionaryDao.read();
         if(dictionary.isEmpty()){
-            return new ResponseMessage<>(EMPTY);
+            return new ResponseMessage<>(EMPTY_DICTIONARY);
         }
         return new ResponseMessage<>(dictionary);
     }

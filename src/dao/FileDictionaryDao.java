@@ -1,12 +1,10 @@
 package dao;
 
-import model.DictionaryImage;
 import exception.EmptyDictionaryException;
 import exception.ExistWordDictionaryException;
 import exception.NotFoundWordDictionaryException;
 import model.Phrase;
 import util.DictionaryType;
-import util.TypesOfWrite;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -50,11 +48,7 @@ public class FileDictionaryDao implements DictionaryDao{
             var oldPhrase = existPhrase.get();
             dictionary.replace(oldPhrase.getWord(), oldPhrase.getTranslate(), newPhrase.getTranslate());
             LOGGER.log(Level.INFO, TRANSLATE + SPACE + oldPhrase.getWord() + UPDATED + SPACE + oldPhrase.getTranslate() + ARROW + newPhrase.getTranslate());
-
-            for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                fileWriter(new Phrase(entry.getKey(), entry.getValue()), TypesOfWrite.NEW_OR_UPDATE);
-            }
-
+            fileWriter(dictionary);
             return newPhrase;
 
         } else {
@@ -80,11 +74,9 @@ public class FileDictionaryDao implements DictionaryDao{
             LOGGER.log(Level.INFO, DELETED + SPACE + phrase);
 
             if(dictionary.isEmpty()){
-                fileWriter(null, TypesOfWrite.DELETE);
+                fileWriter(new HashMap<>());
             } else {
-                for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                    fileWriter(new Phrase(entry.getKey(), entry.getValue()), TypesOfWrite.DELETE);
-                }
+                fileWriter(dictionary);
             }
         } else {
             throw new NotFoundWordDictionaryException(word);
@@ -92,52 +84,6 @@ public class FileDictionaryDao implements DictionaryDao{
         return existPhrase;
     }
 
-    private void fileStorageWriter(DictionaryImage dictionaryImage){
-        var dictionary = dictionaryImage.getDictionary();
-        var rowNumber = dictionaryImage.getRowNumber();
-        var phrase = dictionaryImage.getPhrase();
-        int countSkipRows = 0;
-        try {
-            var file = getFile();
-            Scanner scanner = new Scanner(file);
-            while((scanner.hasNextLine())){
-                countSkipRows++;
-                if(countSkipRows == rowNumber){
-                    try (FileWriter fileWriter = new FileWriter(file)) {
-                        for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                            fileWriter.write(entry.getKey() + SPLITTER + entry.getValue());
-                            fileWriter.write("\n");
-                        }
-                    }
-                }
-
-            }
-            scanner.close();
-
-        } catch (IOException exception){
-            LOGGER.log(Level.WARNING, exception.getMessage());
-        }
-
-    }
-
-    private DictionaryImage getDictionaryImage(String word){
-        Phrase phrase = new Phrase();
-        var dictionary = read();
-        int rowNumber = 0;
-        if(!dictionary.isEmpty()){
-            for(Map.Entry<String, String> entry : dictionary.entrySet()){
-                if(entry.getKey().equals(word)){
-                    phrase.setWord(entry.getKey());
-                    phrase.setTranslate(entry.getValue());
-                }
-                rowNumber++;
-                dictionary.remove(entry.getKey(), entry.getValue());
-
-            }
-            return new DictionaryImage(phrase, rowNumber, dictionary);
-        }
-        return null;
-    }
 
     @Override
     public Optional<Phrase> findByWord(String word) {
@@ -161,7 +107,9 @@ public class FileDictionaryDao implements DictionaryDao{
 
         var existPhrase = findByWord(newPhrase.getWord());
         if(existPhrase.isEmpty()){
-            fileWriter(newPhrase, TypesOfWrite.NEW_OR_UPDATE);
+            Map<String, String> dictionary = new HashMap<>();
+            dictionary.put(newPhrase.getWord(), newPhrase.getTranslate());
+            fileWriter(dictionary);
             LOGGER.log(Level.INFO, PHRASE + SPLITTER + newPhrase.getWord() + SPLITTER + newPhrase.getTranslate() + SPACE + ADDED);
             return newPhrase;
         } else {
@@ -203,31 +151,18 @@ public class FileDictionaryDao implements DictionaryDao{
         return file;
     }
 
-    private void fileWriter(Phrase phrase, TypesOfWrite typesOfWrite){
-       try {
-           var file = getFile();
-           FileWriter fileWriter = new FileWriter(file, true);
-
-           switch (typesOfWrite){
-               case NEW_OR_UPDATE -> {
-                   fileWriter.write(phrase.getWord()+ SPLITTER + phrase.getTranslate());
-                   fileWriter.write("\n");
-               }
-
-               case DELETE -> {
-                   if(phrase == null){
-                       fileWriter.write("");
-                   } else {
-                       fileWriter.write(phrase.getWord() + SPLITTER + phrase.getTranslate());
-                   }
-                   fileWriter.write("\n");
-               }
-           }
-
-           fileWriter.close();
-
-       } catch (IOException exception){
-           LOGGER.log(Level.WARNING, exception.getMessage());
-       }
+    private void fileWriter(Map<String, String> dictionary){
+        try (FileWriter fileWriter = new FileWriter(getFile(), true)) {
+            if(!dictionary.isEmpty()){
+                for(Map.Entry<String, String> entry : dictionary.entrySet()){
+                    fileWriter.write(entry.getKey() + SPLITTER + entry.getValue());
+                    fileWriter.write("\n");
+                }
+            }
+            fileWriter.write("");
+        } catch (IOException exception){
+            LOGGER.log(Level.WARNING, exception.getMessage());
+        }
     }
+
 }
